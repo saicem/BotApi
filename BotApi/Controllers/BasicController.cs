@@ -31,7 +31,7 @@
         /// </summary>
         /// <returns>pong.</returns>
         [HttpGet("ping")]
-        public ApiRes Ping() => new (true, "pong", null);
+        public ApiRes Ping() => new(true, "pong", null);
 
         /// <summary>
         /// get calendar infos.
@@ -50,7 +50,7 @@
                 return new ApiRes(false, "wrong username or passwd", null);
             }
 
-            List<Vevent> eventLs = new ();
+            List<Vevent> eventLs = new();
             for (int i = 0; i < courseLs.Count; i++)
             {
                 Jwc.Models.Course course = courseLs[i];
@@ -105,7 +105,22 @@
         {
             var user = new JwcUser(username, password);
             var notices = await user.GetNoticesAsync();
-            return new ApiRes(false, null, notices);
+            return new ApiRes(true, null, notices);
+        }
+
+        /// <summary>
+        /// get the serialized struct json of courses, for better use of other usage.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        [HttpPost("json")]
+        public async Task<ApiRes> JwcCourseJsonAsync([Required] string username, [Required] string password)
+        {
+            Log.Information($"course/json > {username} {password}");
+            var user = new JwcUser(username, password);
+            var courseLs = await user.GetCoursesAsync();
+            return new ApiRes(true, "获取成功", courseLs);
         }
     }
 }
