@@ -120,6 +120,10 @@
             Log.Information($"course/json > {username} {password}");
             var user = new JwcUser(username, password);
             var courseLs = await user.GetCoursesAsync();
+            if (courseLs == null)
+            {
+                return new ApiRes(false, "错误的账密", null);
+            }
             return new ApiRes(true, "获取成功", courseLs);
         }
     }
