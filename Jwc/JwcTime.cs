@@ -11,12 +11,12 @@
         /// <summary>
         /// Gets 开学第一周周一的前一天.
         /// </summary>
-        public static DateTime TermStart { get; private set; } = JwcConfig.TermStart;
+        public static DateTime TermStart { get; private set; } = Config.TermStart;
 
         /// <summary>
         /// Gets 本周是学期第几周.
         /// </summary>
-        public static int Week => ((DateTime.Now.DayOfYear - TermStart.DayOfYear) / 7) + 1;
+        public static int Week => ((DateTime.Now.DayOfYear - TermStart.DayOfYear -1) / 7) + 1;
 
         /// <summary>
         /// 获取这一周的周一.
@@ -67,10 +67,18 @@
             var dic = new Dictionary<int, string>
             {
                 { 1, "08:00:00" },
+                { 2, "08:50:00" },
                 { 3, "09:55:00" },
+                { 4, "10:45:00" },
+                { 5, "11:35:00" },
                 { 6, "14:00:00" },
+                { 7, "14:50:00" },
+                { 8, "15:55:00" },
                 { 9, "16:45:00" },
+                { 10, "17:35:00" },
                 { 11, "19:00:00" },
+                { 12, "19:50:00" },
+                { 13, "20:40:00" },
             };
             return TimeSpan.Parse(dic[section]);
         }
@@ -100,15 +108,35 @@
         /// 获取日期.
         /// </summary>
         /// <param name="week">开学第几周.</param>
-        /// <param name="day">一周中的第几天.</param>
+        /// <param name="dow">一周中的第几天.</param>
         /// <returns>对应日期.</returns>
-        private static DateTime GetDate(int week, DayOfWeek day) => TermStart + new TimeSpan((7 * (week - 1)) + (((int)day + 6) % 7), 0, 0, 0);
+        private static DateTime GetDate(int week, DayOfWeek dow) => TermStart + new TimeSpan((7 * (week - 1)) + (Dow2Order(dow)), 0, 0, 0);
 
         /// <summary>
         /// 获取日期.
         /// </summary>
         /// <param name="day">The day after this term, start from 1.</param>
         /// <returns>the datetime of the that day.</returns>
-        private static DateTime GetDate(int day) => TermStart + new TimeSpan((day + 6) % 7, 0, 0, 0);
+        private static DateTime GetDate(int day) 
+            => TermStart + new TimeSpan(day, 0, 0, 0);
+
+        /// <summary>
+        /// 将周几按它的数值返回
+        /// </summary>
+        /// <param name="dow"></param>
+        /// <returns></returns>
+        /// <exception cref="NotImplementedException"></exception>
+        public static int Dow2Order(DayOfWeek dow)
+            => dow switch
+            {
+                DayOfWeek.Monday => 1,
+                DayOfWeek.Tuesday => 2,
+                DayOfWeek.Wednesday => 3,
+                DayOfWeek.Thursday => 4,
+                DayOfWeek.Friday => 5,
+                DayOfWeek.Saturday => 6,
+                DayOfWeek.Sunday => 7,
+                _ => throw new NotImplementedException(),
+            };
     }
 }

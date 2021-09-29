@@ -1,8 +1,4 @@
-﻿// <copyright file="RegexHtml.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc
+﻿namespace Jwc
 {
     using System;
     using System.Collections.Generic;

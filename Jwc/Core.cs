@@ -1,8 +1,4 @@
-﻿// <copyright file="JwcCore.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc
+﻿namespace Jwc
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -13,7 +9,7 @@ namespace Jwc
     /// <summary>
     /// 教务处核心组件.
     /// </summary>
-    public static class JwcCore
+    public static class Core
     {
         /// <summary>
         /// get is the user is valid.
@@ -53,7 +49,7 @@ namespace Jwc
                 return null;
             }
 
-            var courses = JwcParser.ParseBksCourse(mainHtml);
+            var courses = Parser.ParseBksCourse(mainHtml);
 
             return courses.ToList();
         }
@@ -66,7 +62,7 @@ namespace Jwc
         public static async Task<string> GetNoticesAsync(this JwcUser user)
         {
             string mainHtml = await user.FetchMainAsync();
-            return JwcParser.ParseNoticeList(mainHtml);
+            return Parser.ParseNoticeList(mainHtml);
         }
     }
 }

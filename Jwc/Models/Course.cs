@@ -1,8 +1,4 @@
-﻿// <copyright file="Course.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc.Models
+﻿namespace Jwc.Models
 {
     using System;
 
@@ -12,27 +8,27 @@ namespace Jwc.Models
     public class Course
     {
         /// <summary>
-        /// Gets or sets the name of the course.
+        /// 课程名
         /// </summary>
-        public string CourseName { get; set; }
+        public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets the room of the course.
+        /// 教室
         /// </summary>
         public string Room { get; set; }
 
         /// <summary>
-        /// Gets or sets the start teaching week of the course.
+        /// 开始周
         /// </summary>
         public int WeekStart { get; set; }
 
         /// <summary>
-        /// Gets or sets the end teaching week of the course.
+        /// 结束周
         /// </summary>
         public int WeekEnd { get; set; }
 
         /// <summary>
-        /// Gets the weekspan of the startweek to endweek.
+        /// 有几周
         /// </summary>
         public int WeekSpan
         {
@@ -40,67 +36,41 @@ namespace Jwc.Models
         }
 
         /// <summary>
-        /// Gets or sets the start small section.
+        /// 开始节
         /// </summary>
         public int SectionStart { get; set; }
 
         /// <summary>
-        /// Gets or sets the end small section.
+        /// 结束节
         /// </summary>
         public int SectionEnd { get; set; }
 
         /// <summary>
-        /// Gets the total small section of this course.
+        /// 几节课
         /// </summary>
-        public int ClassSpan
+        public int SectionSpan
         {
             get { return this.SectionEnd - this.SectionStart + 1; }
         }
 
         /// <summary>
-        /// Gets the order of big course (one big course include 2 or 3 small section).
-        /// </summary>
-        public int BigSectionOrder
-        {
-            get { return GetSection(this.SectionStart); }
-        }
-
-        /// <summary>
-        /// Gets or sets the day of the week about this course.
+        /// 星期几
         /// </summary>
         public DayOfWeek DayOfWeek { get; set; }
 
         /// <summary>
-        /// Gets or sets the teacher of this course.
+        /// 教师
         /// </summary>
         public string Teacher { get; set; }
 
         /// <summary>
-        /// Gets or sets the credit of this course.
+        /// 学分
         /// </summary>
         public string Credit { get; set; }
 
         /// <summary>
-        /// Gets or sets the status of evalute the teaching.
+        /// 是否评教
         /// </summary>
-        public string Status { get; set; }// 是否评教
-
-        /// <summary>
-        /// get the big section from the small section.
-        /// </summary>
-        /// <param name="classStart">the first small section order.</param>
-        /// <returns>the big section order.</returns>
-        public static int GetSection(int classStart)
-        {
-            return classStart switch
-            {
-                1 => 1,
-                3 => 2,
-                6 => 3,
-                9 => 4,
-                11 => 5,
-                _ => -1,
-            };
-        }
+        public string Status { get; set; }
     }
 }

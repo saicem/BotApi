@@ -42,6 +42,7 @@ namespace BotApi
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "BotApi", Version = "v1" });
             });
+            services.AddMemoryCache();
         }
 
         /// <summary>
@@ -64,12 +65,12 @@ namespace BotApi
                 Directory.CreateDirectory("./CalendarFiles");
             }
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(
-                    Path.Combine(env.ContentRootPath, "CalendarFiles")),
-                RequestPath = "/cal",
-            });
+            //app.UseStaticFiles(new StaticFileOptions
+            //{
+            //    FileProvider = new PhysicalFileProvider(
+            //        Path.Combine(env.ContentRootPath, "CalendarFiles")),
+            //    RequestPath = "/cal",
+            //});
 
             app.UseRouting();
 

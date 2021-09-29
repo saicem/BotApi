@@ -1,8 +1,4 @@
-﻿// <copyright file="ApiRes.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace BotApi.Models
+﻿namespace BotApi.Models
 {
     /// <summary>
     /// the common response struct.

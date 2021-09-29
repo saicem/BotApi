@@ -1,8 +1,4 @@
-﻿// <copyright file="JwcUser.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc
+﻿namespace Jwc
 {
     using System;
     using System.Collections.Generic;
@@ -16,11 +12,11 @@ namespace Jwc
         /// <summary>
         /// Initializes a new instance of the <see cref="JwcUser"/> class.
         /// </summary>
-        /// <param name="userName">jwc username.</param>
+        /// <param name="username">jwc username.</param>
         /// <param name="password">jwc password.</param>
-        public JwcUser(string userName, string password)
+        public JwcUser(string username, string password)
         {
-            this.UserName = userName;
+            this.Username = username;
             this.Password = password;
             var client = new HttpClient(new HttpClientHandler { UseCookies = true });
 
@@ -35,7 +31,7 @@ namespace Jwc
         /// <summary>
         /// Gets or sets the userName for jwc login.
         /// </summary>
-        public string UserName { get; set; }
+        public string Username { get; set; }
 
         /// <summary>
         /// Gets or sets the password for jwc login.

@@ -1,8 +1,4 @@
-﻿// <copyright file="JwcParser.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc
+﻿namespace Jwc
 {
     using System;
     using System.Collections.Generic;
@@ -13,13 +9,8 @@ namespace Jwc
     /// <summary>
     /// parse html to get infomation.
     /// </summary>
-    public class JwcParser
+    public class Parser
     {
-        // bool IsContentValid()
-        // {
-        //    return Regex.IsMatch(_dataSource, @"武汉理工大学学分制教务管理信息系统");
-        // }
-
         /// <summary>
         /// parse the main page of jwc.
         /// </summary>
@@ -58,7 +49,7 @@ namespace Jwc
                         {
                             var course = new Course
                             {
-                                CourseName = info.Groups[1].Value,
+                                Name = info.Groups[1].Value,
                                 Room = info.Groups[2].Value,
                                 WeekStart = int.Parse(weekMatch.Groups[1].Value),
                                 WeekEnd = int.Parse(weekMatch.Groups[2].Value),
@@ -67,14 +58,14 @@ namespace Jwc
                                 DayOfWeek = (DayOfWeek)(weekDay % 7),
                                 Teacher = string.Empty,
                             };
-                            if (courseTeacherDic.ContainsKey(course.CourseName))
+                            if (courseTeacherDic.ContainsKey(course.Name))
                             {
-                                course.Teacher = courseTeacherDic[course.CourseName];
+                                course.Teacher = courseTeacherDic[course.Name];
                             }
 
-                            if (courseCreditDic.ContainsKey(course.CourseName))
+                            if (courseCreditDic.ContainsKey(course.Name))
                             {
-                                course.Credit = courseCreditDic[course.CourseName];
+                                course.Credit = courseCreditDic[course.Name];
                             }
 
                             yield return course;

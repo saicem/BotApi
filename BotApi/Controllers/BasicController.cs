@@ -1,4 +1,6 @@
-﻿namespace BotApi.Controllers
+﻿
+
+namespace BotApi.Controllers
 {
     using System;
     using System.Collections.Generic;
@@ -8,9 +10,9 @@
     using CalCreate;
     using Jwc;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Serilog;
-
     /// <summary>
     /// the basic controller.
     /// </summary>
@@ -19,12 +21,17 @@
     public class BasicController : ControllerBase
     {
         private readonly IConfiguration configuration;
+        private readonly IMemoryCache cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BasicController"/> class.
         /// </summary>
         /// <param name="configuration"> config svc.</param>
-        public BasicController(IConfiguration configuration) => this.configuration = configuration;
+        public BasicController(IConfiguration configuration,IMemoryCache cache)
+        {
+            this.configuration = configuration;
+            this.cache = cache;
+        }
 
         /// <summary>
         /// test if the api can be use.
@@ -36,14 +43,14 @@
         /// <summary>
         /// get calendar infos.
         /// </summary>
-        /// <param name="userName"> jwc username.</param>
+        /// <param name="username"> jwc username.</param>
         /// <param name="password"> jwc password.</param>
         /// <returns>A <see cref="Task{TResult}"/> get calendar infos.</returns>
         [HttpPost("cal")]
-        public async Task<ApiRes> GetCalAsync([Required] string userName, [Required] string password)
+        public async Task<ApiRes> GetCalAsync([Required] string username, [Required] string password)
         {
-            Log.Information($"course/cal > {userName} {password}");
-            var user = new JwcUser(userName, password);
+            Log.Information($"course/cal > {username} {password}");
+            var user = new JwcUser(username, password);
             var courseLs = await user.GetCoursesAsync();
             if (courseLs == null)
             {
@@ -59,7 +66,7 @@
                     DTSTAMP = DateTime.Now,
                     DTSTART = JwcTime.GetCourseStartDate(course.WeekStart, course.DayOfWeek, course.SectionStart),
                     DTEND = JwcTime.GetCourseEndDate(course.WeekStart, course.DayOfWeek, course.SectionEnd),
-                    SUMMARY = course.CourseName,
+                    SUMMARY = course.Name,
                     DESCRIPTION = $"老师:{course.Teacher}\\n学分:{course.Credit}",
                     LOCATION = course.Room,
                     RRULE = $"FREQ=WEEKLY;INTERVAL=1;BYDAY={DowStr.Get(course.DayOfWeek)};COUNT={course.WeekSpan}",
@@ -68,23 +75,38 @@
             }
 
             // TODO 缓存策略 随机文件名 定期删除
-            var fileName = $"{userName}.ics";
+            var fileName = $"{username}.ics";
             var path = $"CalendarFiles/{fileName}";
-            CalCreater.CalendarMake(eventLs, path, userName);
+            CalCreater.CalendarMake(eventLs, path, username);
             var localhost = this.configuration["localhost"];
-            return new ApiRes(true, "Success", $"{localhost}/cal/{fileName}");
+            var token = GetRandomString(32, true, true, true, false, string.Empty);
+            var expireTime = DateTime.Now.AddSeconds(600);
+            cache.Set(token, fileName, expireTime);
+            return new ApiRes(true, "Success", $"{localhost}/cal/{token}");
+        }
+
+        [HttpGet("cal/{token}")]
+        public IActionResult GetCal(string token)
+        {
+            var success = cache.TryGetValue(token, out var fileName);
+            if (!success)
+            {
+                return StatusCode(406);
+            }
+            using var stream = System.IO.File.OpenRead($"./CalendarFiles/{fileName}");
+            return File(stream, "application/octet-stream", $"{token}.ics");
         }
 
         /// <summary>
         /// verify the user is valid. if valid, get his name.
         /// </summary>
-        /// <param name="userName"> jwc username.</param>
+        /// <param name="username"> jwc username.</param>
         /// <param name="password"> jwc password.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the result of the asynchronous operation.</returns>
         [HttpPost("verify")]
-        public async Task<ApiRes> JwcVerifyAsync([Required] string userName, [Required] string password)
+        public async Task<ApiRes> JwcVerifyAsync([Required] string username, [Required] string password)
         {
-            var user = new JwcUser(userName, password);
+            var user = new JwcUser(username, password);
             var name = await user.GetValidAsync();
             if (name != null)
             {
@@ -125,6 +147,23 @@
                 return new ApiRes(false, "错误的账密", null);
             }
             return new ApiRes(true, "获取成功", courseLs);
+        }
+
+        private static string GetRandomString(int length, bool useNum, bool useLow, bool useUpp, bool useSpe, string custom)
+        {
+            byte[] b = new byte[4];
+            new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
+            Random r = new Random(BitConverter.ToInt32(b, 0));
+            string s = null, str = custom;
+            if (useNum == true) { str += "0123456789"; }
+            if (useLow == true) { str += "abcdefghijklmnopqrstuvwxyz"; }
+            if (useUpp == true) { str += "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; }
+            if (useSpe == true) { str += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; }
+            for (int i = 0; i < length; i++)
+            {
+                s += str.Substring(r.Next(0, str.Length - 1), 1);
+            }
+            return s;
         }
     }
 }

@@ -1,8 +1,4 @@
-﻿// <copyright file="Grade.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc.Models
+﻿namespace Jwc.Models
 {
     using System.Collections.Generic;
 

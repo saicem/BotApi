@@ -1,8 +1,4 @@
-﻿// <copyright file="JwcSpider.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
-namespace Jwc
+﻿namespace Jwc
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +11,7 @@ namespace Jwc
     /// <summary>
     /// Use for scrape the infos.
     /// </summary>
-    public static class JwcSpider
+    public static class Spider
     {
         private const string UriCode = "http://sso.jwc.whut.edu.cn/Certification/getCode.do";
         private const string UriLogin = "http://sso.jwc.whut.edu.cn/Certification/login.do";
@@ -42,7 +38,7 @@ namespace Jwc
         /// <returns>成绩页面的html.</returns>
         public static async Task<string> FetchGradeAsync(this JwcUser user, string snkey)
         {
-            string url = $"{UriGrade}?pageNum=1&numPerPage=200&xh={user.UserName}&snkey={snkey}";
+            string url = $"{UriGrade}?pageNum=1&numPerPage=200&xh={user.Username}&snkey={snkey}";
             var res = await user.Client.GetAsync(url);
             return await res.Content.ReadAsStringAsync();
         }
@@ -54,9 +50,9 @@ namespace Jwc
         /// <returns>the main page html of jwc.</returns>
         public static async Task<string> FetchMainAsync(this JwcUser user)
         {
-            string userName1 = Md5(user.UserName);
-            string password1 = Sha1(user.UserName + user.Password);
-            string webfinger = GenerateFakeFinger();
+            string userName1 = Tool.Md5(user.Username);
+            string password1 = Tool.Sha1(user.Username + user.Password);
+            string webfinger = Tool.GenerateFakeFinger();
             string rnd = new Random().Next(10000, 99999).ToString();
             string type = "xs";
             string code = await FetchCodeAsync(user, webfinger);
@@ -64,7 +60,7 @@ namespace Jwc
             {
                 { "code", code },
                 { "webfinger", webfinger },
-                { "userName", user.UserName },
+                { "userName", user.Username },
                 { "password", user.Password },
                 { "userName1", userName1 },
                 { "password1", password1 },
@@ -72,8 +68,6 @@ namespace Jwc
                 { "type", type },
             });
             var html = await (await user.Client.PostAsync(UriLogin, httpContent)).Content.ReadAsStringAsync();
-
-            // 获得 CERLOGIN
             return html;
         }
 
@@ -95,8 +89,6 @@ namespace Jwc
         /// <returns>roooms.</returns>
         public static async Task<string> FetchRoomsAsync(this JwcUser user)
         {
-            // 先请求课程查询页面获得cookie
-            // 获得 JSESSIONID
             var resRoomPage = await user.Client.GetAsync(UriRoomPage);
             bool isSuccess = resRoomPage.IsSuccessStatusCode;
             if (!isSuccess)
@@ -118,40 +110,6 @@ namespace Jwc
         {
             string urlCode = $"{UriCode}?webfinger={webfinger}";
             return await (await user.Client.GetAsync(urlCode)).Content.ReadAsStringAsync();
-        }
-
-        private static string GenerateFakeFinger()
-        {
-            var random = new Random();
-            var chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-            var finger = new string(Enumerable.Repeat(chars, 32).Select(s => s[random.Next(chars.Length)]).ToArray());
-            return finger;
-        }
-
-        private static string Md5(string oldstring)
-        {
-            byte[] byteOld = Encoding.UTF8.GetBytes(oldstring);
-            byte[] byteNew = MD5.Create().ComputeHash(byteOld);
-            StringBuilder sb = new();
-            foreach (var b in byteNew)
-            {
-                sb.Append(b.ToString("x2"));
-            }
-
-            return sb.ToString();
-        }
-
-        private static string Sha1(string oldstring)
-        {
-            byte[] byteOld = Encoding.UTF8.GetBytes(oldstring);
-            byte[] byteNew = SHA1.Create().ComputeHash(byteOld);
-            StringBuilder sb = new();
-            foreach (var b in byteNew)
-            {
-                sb.Append(b.ToString("x2"));
-            }
-
-            return sb.ToString();
         }
     }
 }
