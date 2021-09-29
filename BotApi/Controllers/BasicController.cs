@@ -93,7 +93,7 @@ namespace BotApi.Controllers
             {
                 return StatusCode(406);
             }
-            using var stream = System.IO.File.OpenRead($"./CalendarFiles/{fileName}");
+            var stream = System.IO.File.OpenRead($"./CalendarFiles/{fileName}");
             return File(stream, "application/octet-stream", $"{token}.ics");
         }
 
