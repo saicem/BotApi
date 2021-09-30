@@ -1,18 +1,18 @@
-﻿
-
-namespace BotApi.Controllers
+﻿namespace BotApi.Controllers
 {
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Threading.Tasks;
-    using BotApi.Models;
-    using CalCreate;
-    using Jwc;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.Extensions.Caching.Memory;
     using Microsoft.Extensions.Configuration;
     using Serilog;
+    using BotApi.Models;
+    using CalCreate;
+    using Jwc;
+    using System.Linq;
+
     /// <summary>
     /// the basic controller.
     /// </summary>
@@ -94,7 +94,7 @@ namespace BotApi.Controllers
                 return StatusCode(406);
             }
             var stream = System.IO.File.OpenRead($"./CalendarFiles/{fileName}");
-            return File(stream, "application/octet-stream", $"{token}.ics");
+            return File(stream, "application/octet-stream", $"course.ics");
         }
 
         /// <summary>
@@ -137,7 +137,7 @@ namespace BotApi.Controllers
         /// <param name="password"></param>
         /// <returns></returns>
         [HttpPost("json")]
-        public async Task<ApiRes> JwcCourseJsonAsync([Required] string username, [Required] string password)
+        public async Task<ApiRes> JwcCourseJsonAsync([Required] string username, [Required] string password, int weekOrder = 0)
         {
             Log.Information($"course/json > {username} {password}");
             var user = new JwcUser(username, password);
@@ -146,14 +146,19 @@ namespace BotApi.Controllers
             {
                 return new ApiRes(false, "错误的账密", null);
             }
-            return new ApiRes(true, "获取成功", courseLs);
+            if (weekOrder == 0)
+            {
+                return new ApiRes(true, "获取成功", courseLs);
+            }
+            var retCourses = from course in courseLs where course.WeekStart <= weekOrder && course.WeekEnd >= weekOrder select course;
+            return new ApiRes(true, "获取成功", retCourses);
         }
 
         private static string GetRandomString(int length, bool useNum, bool useLow, bool useUpp, bool useSpe, string custom)
         {
             byte[] b = new byte[4];
             new System.Security.Cryptography.RNGCryptoServiceProvider().GetBytes(b);
-            Random r = new Random(BitConverter.ToInt32(b, 0));
+            Random rand = new(BitConverter.ToInt32(b, 0));
             string s = null, str = custom;
             if (useNum == true) { str += "0123456789"; }
             if (useLow == true) { str += "abcdefghijklmnopqrstuvwxyz"; }
@@ -161,7 +166,7 @@ namespace BotApi.Controllers
             if (useSpe == true) { str += "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~"; }
             for (int i = 0; i < length; i++)
             {
-                s += str.Substring(r.Next(0, str.Length - 1), 1);
+                s += str.Substring(rand.Next(0, str.Length - 1), 1);
             }
             return s;
         }

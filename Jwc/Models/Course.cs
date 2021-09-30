@@ -1,6 +1,7 @@
 ﻿namespace Jwc.Models
 {
     using System;
+    using System.Text.Json.Serialization;
 
     /// <summary>
     /// the course.
@@ -30,6 +31,7 @@
         /// <summary>
         /// 有几周
         /// </summary>
+        [JsonIgnore]
         public int WeekSpan
         {
             get { return this.WeekEnd - this.WeekStart + 1; }
@@ -48,6 +50,7 @@
         /// <summary>
         /// 几节课
         /// </summary>
+        [JsonIgnore]
         public int SectionSpan
         {
             get { return this.SectionEnd - this.SectionStart + 1; }
@@ -71,6 +74,7 @@
         /// <summary>
         /// 是否评教
         /// </summary>
+        [JsonIgnore]
         public string Status { get; set; }
     }
 }
