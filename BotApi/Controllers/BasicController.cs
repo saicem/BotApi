@@ -82,7 +82,7 @@
             var token = GetRandomString(32, true, true, true, false, string.Empty);
             var expireTime = DateTime.Now.AddSeconds(600);
             cache.Set(token, fileName, expireTime);
-            return new ApiRes(true, "Success", $"{localhost}/cal/{token}");
+            return new ApiRes(true, "Success", $"{localhost}/api/jwc/cal/{token}");
         }
 
         [HttpGet("cal/{token}")]
