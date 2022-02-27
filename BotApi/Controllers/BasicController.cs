@@ -91,7 +91,7 @@
             var success = cache.TryGetValue(token, out var fileName);
             if (!success)
             {
-                return StatusCode(406);
+                return StatusCode(406,"文件过期或链接错误");
             }
             var stream = System.IO.File.OpenRead($"./CalendarFiles/{fileName}");
             return File(stream, "application/octet-stream", $"course.ics");
