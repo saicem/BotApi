@@ -9,14 +9,14 @@
     public static class JwcTime
     {
         /// <summary>
-        /// Gets 开学第一周周一的前一天.
+        /// Gets 开学第一周周一.
         /// </summary>
         public static DateTime TermStart { get; private set; } = Config.TermStart;
 
         /// <summary>
         /// Gets 本周是学期第几周.
         /// </summary>
-        public static int Week => ((DateTime.Now.DayOfYear - TermStart.DayOfYear -1) / 7) + 1;
+        public static int Week => ((DateTime.Now - TermStart).Days / 7) + 1;
 
         /// <summary>
         /// 获取这一周的周一.
@@ -110,7 +110,7 @@
         /// <param name="week">开学第几周.</param>
         /// <param name="dow">一周中的第几天.</param>
         /// <returns>对应日期.</returns>
-        private static DateTime GetDate(int week, DayOfWeek dow) => TermStart + new TimeSpan((7 * (week - 1)) + (Dow2Order(dow)), 0, 0, 0);
+        private static DateTime GetDate(int week, DayOfWeek dow) => TermStart + new TimeSpan((7 * (week - 1)) + Dow2Order(dow) - 1, 0, 0, 0);
 
         /// <summary>
         /// 获取日期.
@@ -118,7 +118,7 @@
         /// <param name="day">The day after this term, start from 1.</param>
         /// <returns>the datetime of the that day.</returns>
         private static DateTime GetDate(int day) 
-            => TermStart + new TimeSpan(day, 0, 0, 0);
+            => TermStart + new TimeSpan(day - 1, 0, 0, 0);
 
         /// <summary>
         /// 将周几按它的数值返回

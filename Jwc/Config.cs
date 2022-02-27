@@ -8,8 +8,8 @@
     internal class Config
     {
         /// <summary>
-        /// Gets the daytime before the first Monday of the term.
+        /// Gets the daytime of the first Monday of the term.
         /// </summary>
-        public static DateTime TermStart { get; } = new (2022, 2, 21);
+        public static DateTime TermStart { get; } = new (2022, 2, 28);
     }
 }
