@@ -10,6 +10,6 @@
         /// <summary>
         /// Gets the daytime before the first Monday of the term.
         /// </summary>
-        public static DateTime TermStart { get; } = new (2022, 2, 28);
+        public static DateTime TermStart { get; } = new (2022, 2, 21);
     }
 }
